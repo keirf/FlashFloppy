@@ -2258,9 +2258,10 @@ static void mfm_prep_track(struct image *im)
     const uint8_t GAP_3[] = { 32, 54, 84, 116, 255, 255, 255, 255 };
     struct raw_trk *trk = im->img.trk;
     uint32_t tracklen;
-    bool_t auto_gap_3;
+    bool_t auto_gap_2, auto_gap_3;
     unsigned int i;
 
+    auto_gap_2 = (trk->gap_2 < 0);
     if (trk->gap_2 < 0)
         trk->gap_2 = MFM_GAP_2;
     auto_gap_3 = (trk->gap_3 < 0);
@@ -2295,6 +2296,13 @@ static void mfm_prep_track(struct image *im)
                 break;
         }
         trk->data_rate = 125u << i; /* DD=250, HD=500, ED=1000 */
+    }
+
+    if (auto_gap_2 && (trk->data_rate >= 1000)) {
+        int old_gap_2 = trk->gap_2;
+        trk->gap_2 = 41;
+        im->img.idam_sz += trk->gap_2 - old_gap_2;
+        tracklen += 16 * trk->nr_sectors * (trk->gap_2 - old_gap_2);
     }
 
     /* Calculate standard track length from data rate and RPM. */
