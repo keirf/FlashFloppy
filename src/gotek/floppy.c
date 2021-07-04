@@ -64,6 +64,7 @@ static const struct exti_irq exti_irqs[] = {
 
 bool_t floppy_ribbon_is_reversed(void)
 {
+#if 0
     time_t t_start = time_now();
 
     /* If ribbon is reversed then most/all inputs are grounded. 
@@ -75,7 +76,7 @@ bool_t floppy_ribbon_is_reversed(void)
         if (time_since(t_start) > time_ms(1000))
             return TRUE;
     }
-
+#endif
     return FALSE;
 }
 
